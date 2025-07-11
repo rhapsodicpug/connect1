@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "social_360_backend": {
+      "candid": "src/social_360_backend/social_360_backend.did",
+      "package": "social_360_backend",
+      "type": "rust"
+    },
+    "social_360_frontend": {
+      "dependencies": [
+        "social_360_backend"
+      ],
+      "source": [
+        "src/social_360_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "social_360_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

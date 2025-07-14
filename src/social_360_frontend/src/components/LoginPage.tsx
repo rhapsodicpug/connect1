@@ -4,7 +4,7 @@ import { useAuth, useAuthError } from "../contexts/AuthContext";
 import { Wallet, User, Sparkles, XCircle } from "lucide-react";
 
 const LoginPage: React.FC = () => {
-  const { login, mockLogin } = useAuth();
+  const { loginWithII, mockLogin } = useAuth();
   const { error, clearError } = useAuthError();
   const [isLoading, setIsLoading] = useState(false);
   const [isMockLoading, setIsMockLoading] = useState(false);
@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      await login();
+      await loginWithII();
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -95,7 +95,7 @@ const LoginPage: React.FC = () => {
             whileTap={{ scale: 0.98 }}
           >
             <Wallet size={20} />
-            {isLoading ? "Connecting..." : "Connect with Plug Wallet"}
+            {isLoading ? "Connecting..." : "Connect with Internet Identity"}
           </motion.button>
 
           <div className="divider">

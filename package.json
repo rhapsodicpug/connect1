@@ -16,6 +16,7 @@
     "src/social_360_frontend"
   ],
   "dependencies": {
+    "@dfinity/auth-client": "^2.4.1",
     "bootstrap": "^5.3.7"
   }
 }

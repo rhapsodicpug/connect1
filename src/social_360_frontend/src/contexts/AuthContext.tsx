@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as backend from "../backend/social360";
+import { AuthClient } from "@dfinity/auth-client";
 
 interface User {
   id: string; // principal
@@ -14,6 +15,7 @@ interface AuthContextType {
   login: () => Promise<void>;
   mockLogin: () => Promise<void>;
   logout: () => void;
+  loginWithII: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     setError(null);
     try {
-      // Get principal (always mock for local development)
+      // Always use mock principal for guest login
       const principal = await backend.getPrincipal();
 
       // Try to fetch user profile from backend
@@ -138,6 +140,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
   };
 
+  const loginWithII = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const authClient = await AuthClient.create();
+      await authClient.login({
+        identityProvider: "https://identity.ic0.app/#authorize",
+        onSuccess: async () => {
+          const identity = authClient.getIdentity();
+          const principal = identity.getPrincipal().toText();
+
+          // Try to fetch user profile from backend
+          let profile = await backend.getUser(principal);
+          let handle = "";
+
+          if (
+            profile &&
+            Array.isArray(profile) &&
+            profile[0] &&
+            profile[0].handle
+          ) {
+            handle = profile[0].handle;
+          } else if (
+            profile &&
+            typeof profile === "object" &&
+            "handle" in profile
+          ) {
+            handle = (profile as any).handle;
+          } else {
+            // If not registered, register with a default handle
+            handle = `user_${principal.slice(0, 8)}`;
+            try {
+              await backend.register(handle);
+              // Fetch again to ensure registration
+              profile = await backend.getUser(principal);
+              if (
+                profile &&
+                Array.isArray(profile) &&
+                profile[0] &&
+                profile[0].handle
+              ) {
+                handle = profile[0].handle;
+              } else if (
+                profile &&
+                typeof profile === "object" &&
+                "handle" in profile
+              ) {
+                handle = (profile as any).handle;
+              }
+            } catch (registerError) {
+              console.error("Registration failed:", registerError);
+              // Continue with default handle if registration fails
+            }
+          }
+
+          const newUser: User = {
+            id: principal,
+            handle,
+            principal,
+          };
+          setUser(newUser);
+          localStorage.setItem("user", JSON.stringify(newUser));
+          setIsLoading(false);
+        },
+        onError: (err) => {
+          setError("Internet Identity login failed");
+          setIsLoading(false);
+        },
+      });
+    } catch (error: any) {
+      setError(error?.message || "Internet Identity login failed");
+      setIsLoading(false);
+    }
+  };
+
   const clearError = () => setError(null);
 
   return (
@@ -149,6 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         login,
         mockLogin,
         logout,
+        loginWithII, // Export the new function
       }}
     >
       <AuthErrorContext.Provider value={{ error, clearError }}>

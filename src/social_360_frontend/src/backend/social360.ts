@@ -9,14 +9,14 @@ const getCanisterId = () => {
     return canisterId;
   }
   // Fallback to hardcoded canister ID for local development
-  return 'u6s2n-gx777-77774-qaaba-cai';
+  return 'ucwa4-rx777-77774-qaada-cai';
 };
 
-// Helper to get principal from Plug or mock
+// Helper to get principal from context or mock (deprecated except for guest mode)
+// Remove usage in favor of passing principal from user context
 export async function getPrincipal(): Promise<string> {
-  // For local development, use a mock principal
-  // Plug Wallet is designed for mainnet, not local development
-  console.log('Using mock principal for local development');
+  // This should only be used for guest mode
+  console.log('Using mock principal for guest mode');
   return '2vxsx-fae';
 }
 

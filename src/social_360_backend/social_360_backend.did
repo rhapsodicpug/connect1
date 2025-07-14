@@ -1,3 +1,47 @@
 service : {
-    "greet": (text) -> (text) query;
+  "register": (text) -> ();
+  "get_user": (principal) -> (opt record { handle: text });
+  "post_update": (text) -> (nat64);
+  "repost_update": (nat64) -> (nat64);
+  "quote_update": (nat64, text) -> (nat64);
+  "follow": (principal) -> ();
+  "like_update": (nat64) -> (bool);
+  "has_liked_update": (nat64, principal) -> (bool);
+  "has_reposted_update": (nat64, principal) -> (bool);
+  "get_timeline": (nat64, nat64) -> (vec record {
+    id: nat64;
+    author: principal;
+    content: text;
+    timestamp: nat64;
+    likes: nat64;
+    reposts: nat64;
+    quotes: nat64;
+    original_post_id: opt nat64;
+    quote_content: opt text;
+  });
+  "search_updates": (text) -> (vec record {
+    id: nat64;
+    author: principal;
+    content: text;
+    timestamp: nat64;
+    likes: nat64;
+    reposts: nat64;
+    quotes: nat64;
+    original_post_id: opt nat64;
+    quote_content: opt text;
+  });
+  "search_users": (text) -> (vec record { principal; record { handle: text } });
+  "get_user_updates": (principal, nat64, nat64) -> (vec record {
+    id: nat64;
+    author: principal;
+    content: text;
+    timestamp: nat64;
+    likes: nat64;
+    reposts: nat64;
+    quotes: nat64;
+    original_post_id: opt nat64;
+    quote_content: opt text;
+  });
+  "get_followers": (principal) -> (vec principal);
+  "get_following": (principal) -> (vec principal);
 }

@@ -1,0 +1,32 @@
+{
+  "canisters": {
+    "social_360_backend": {
+      "candid": "src/social_360_backend/social_360_backend.did",
+      "package": "social_360_backend",
+      "type": "rust"
+    },
+    "social_360_frontend": {
+      "dependencies": [
+        "social_360_backend"
+      ],
+      "source": [
+        "src/social_360_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "social_360_frontend"
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

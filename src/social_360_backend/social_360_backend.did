@@ -1,0 +1,110 @@
+type ModerationSeverity = variant {
+  Low;
+  Medium;
+  High;
+  Critical;
+};
+
+type ContentCategory = variant {
+  Personal;
+  Professional;
+  Entertainment;
+  News;
+  Educational;
+  Promotional;
+  Question;
+  Story;
+  Opinion;
+  Other;
+};
+
+type EngagementPrediction = record {
+  predicted_likes: nat32;
+  predicted_shares: nat32;
+  predicted_comments: nat32;
+  viral_potential: float32;
+};
+
+type AIInsights = record {
+  content_score: nat8;
+  engagement_prediction: EngagementPrediction;
+  audience_reach: nat32;
+  optimization_suggestions: vec text;
+  trending_topics: vec text;
+  best_posting_time: text;
+  content_category: ContentCategory;
+  sentiment_score: float32;
+};
+
+type Warning = record {
+  id: nat64;
+  reason: text;
+  severity: ModerationSeverity;
+  timestamp: nat64;
+  expires_at: opt nat64;
+};
+
+type ModerationFlag = record {
+  update_id: nat64;
+  flagged_by: principal;
+  reason: text;
+  severity: ModerationSeverity;
+  timestamp: nat64;
+  is_resolved: bool;
+};
+
+type User = record {
+  handle: text;
+  is_verified: bool;
+  warning_count: nat32;
+  is_suspended: bool;
+  suspension_until: opt nat64;
+};
+
+type Update = record {
+  id: nat64;
+  author: principal;
+  content: text;
+  timestamp: nat64;
+  likes: nat64;
+  reposts: nat64;
+  quotes: nat64;
+  original_post_id: opt nat64;
+  quote_content: opt text;
+  is_moderated: bool;
+  moderation_reason: opt text;
+  is_hidden: bool;
+};
+
+service : {
+  "register": (text) -> ();
+  "get_user": (principal) -> (opt User);
+  "post_update": (text) -> (nat64);
+  "repost_update": (nat64) -> (nat64);
+  "quote_update": (nat64, text) -> (nat64);
+  "follow": (principal) -> ();
+  "like_update": (nat64) -> (bool);
+  "has_liked_update": (nat64, principal) -> (bool);
+  "has_reposted_update": (nat64, principal) -> (bool);
+  "get_timeline": (nat64, nat64) -> (vec Update);
+  "search_updates": (text) -> (vec Update);
+  "search_users": (text) -> (vec record { principal; User });
+  "get_user_updates": (principal, nat64, nat64) -> (vec Update);
+  "get_followers": (principal) -> (vec principal);
+  "get_following": (principal) -> (vec principal);
+  
+  // New moderation functions
+  "flag_update": (nat64, text, ModerationSeverity) -> (bool);
+  "resolve_flag": (nat64) -> (bool);
+  "moderate_update": (nat64, text, ModerationSeverity) -> (bool);
+  "unmoderate_update": (nat64) -> (bool);
+  "get_user_warnings": (principal) -> (vec Warning);
+  "get_flagged_content": () -> (vec record { nat64; ModerationFlag });
+  "get_moderated_updates": () -> (vec Update);
+  "suspend_user": (principal, nat64) -> (bool);
+  "unsuspend_user": (principal) -> (bool);
+  "verify_user": (principal) -> (bool);
+  
+  // AI Insights function
+  "get_ai_insights": (text) -> (AIInsights);
+}
